@@ -9,12 +9,26 @@ enum HttpStatus {
 }
 
 type Handlers = {
-    next?: (value: any) => void;
-    error?: (error: any) => void;
+    next?: (value: RequestType) => void;
+    error?: (error: string) => void;
     complete?: () => void;
 };
 
-type RequestType = { method: string, host: string, path: string, body?: any, params?: any };
+type RequestType = {
+  method: string,
+  host: string,
+  path: string,
+  body?: {
+    name: string,
+    age: number,
+    roles: string[],
+    createdAt: Date,
+    isDeleated: boolean,
+  },
+  params?: {
+    id?: undefined | string,
+  },
+};
 
 class Observer {
 
@@ -28,13 +42,13 @@ class Observer {
       this._unsubscribe = () => {};
     }
   
-    next(value: any): void {
+    next(value: RequestType): void {
       if (this.handlers.next && !this.isUnsubscribed) {
         this.handlers.next(value);
       }
     }
   
-    error(error: any): void {
+    error(error: string): void {
       if (!this.isUnsubscribed) {
         if (this.handlers.error) {
           this.handlers.error(error);
@@ -125,11 +139,11 @@ class Observer {
   ];
 
   
-  const handleRequest = (request: any) => {
+  const handleRequest = (request: RequestType) => {
     // handling of request
     return {status: HttpStatus.OK};
   };
-  const handleError = (error: any) => {
+  const handleError = (error: string) => {
     // handling of error
     return {status: HttpStatus.INTERNAL_SERVER_ERROR};
   };
